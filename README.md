@@ -25,9 +25,11 @@ Install **both** packages.
 
 ## Prerequisites
 
-1. [mnemosyne](https://github.com/gandazgul/mnemosyne) on `PATH`
-2. [pi](https://pi.dev)
-3. `npm:pi-mnemosyne` already installed (recommended)
+Install these first. This package is a companion, not a replacement.
+
+1. **[mnemosyne](https://github.com/gandazgul/mnemosyne)** — local CLI + SQLite collections. Must be on `PATH`.
+2. **[pi-mnemosyne](https://github.com/gandazgul/pi-mnemosyne)** — Pi session-memory plugin (`memory_recall`, `memory_store`, `global`, `core`). Install with `pi install npm:pi-mnemosyne`.
+3. **[Pi](https://pi.dev)** — the agent that loads both packages from `~/.pi/agent`.
 
 ## Install
 
