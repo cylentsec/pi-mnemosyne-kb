@@ -1,0 +1,18 @@
+{
+  "limit": 6,
+  "maxRawBytes": 8000000,
+  "maxCleanBytes": 400000,
+  "skipPathContains": [
+    ".obsidian",
+    ".git",
+    "node_modules",
+    "/Attachments/"
+  ],
+  "collections": [
+    {
+      "name": "AppSec",
+      "path": "/absolute/path/to/your/AppSec/notes",
+      "tags": ["appsec"]
+    }
+  ]
+}

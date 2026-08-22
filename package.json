@@ -1,0 +1,58 @@
+{
+  "name": "pi-mnemosyne-kb",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Pi companion for pi-mnemosyne: index a local Markdown notes directory into a named Mnemosyne collection and recall it on demand.",
+  "author": "CylentSec <scampbell@cylentsec.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cylentsec/pi-mnemosyne-kb.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cylentsec/pi-mnemosyne-kb/issues"
+  },
+  "homepage": "https://github.com/cylentsec/pi-mnemosyne-kb#readme",
+  "bin": {
+    "pi-mnemosyne-kb": "./bin/pi-mnemosyne-kb.mjs"
+  },
+  "keywords": [
+    "pi-package",
+    "pi",
+    "mnemosyne",
+    "rag",
+    "notes",
+    "obsidian",
+    "knowledge-base"
+  ],
+  "pi": {
+    "extensions": [
+      "./extensions/kb.ts"
+    ],
+    "skills": [
+      "./skills"
+    ]
+  },
+  "files": [
+    "bin",
+    "extensions",
+    "lib",
+    "skills",
+    "config.example.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "index": "node ./bin/pi-mnemosyne-kb.mjs index",
+    "status": "node ./bin/pi-mnemosyne-kb.mjs status"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-ai": "*",
+    "@earendil-works/pi-coding-agent": "*",
+    "typebox": "*"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
