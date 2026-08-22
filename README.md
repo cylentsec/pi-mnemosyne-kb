@@ -111,17 +111,41 @@ Replace `AppSec` with the `name` from your config. Start a new Pi session after 
 
 ## Index
 
-Preview, then rebuild. Rebuild deletes and recreates that collection only.
+There is no live file watcher. After you change notes, you refresh the collection yourself.
+
+| What you did | Command | What it does |
+|---|---|---|
+| First time, or you **edited / deleted** existing notes | `index` | **Rebuild.** Deletes that collection and re-reads every Markdown file. |
+| You **added new notes** only | `add --new` | **Append.** Indexes files that are not in the collection yet. Leaves existing chunks alone. |
+| You want to append **specific files** | `add path/to/note.md` | **Append those files.** Must sit under the configured notes path. |
+
+Preview first with `--dry-run`.
 
 ```bash
-npx --yes --prefix . pi-mnemosyne-kb --help   # if linked
 node bin/pi-mnemosyne-kb.mjs status
+
+# Rebuild after edits (normal update path)
 node bin/pi-mnemosyne-kb.mjs index --dry-run
 node bin/pi-mnemosyne-kb.mjs index
+
+# Append only notes that are not indexed yet
+node bin/pi-mnemosyne-kb.mjs add --new --dry-run
+node bin/pi-mnemosyne-kb.mjs add --new
+
+# Append one new file
+node bin/pi-mnemosyne-kb.mjs add --dry-run "/absolute/path/to/your/AppSec/Web/New Note.md"
+node bin/pi-mnemosyne-kb.mjs add "/absolute/path/to/your/AppSec/Web/New Note.md"
+
 node bin/pi-mnemosyne-kb.mjs search "boolean blind SQLi"
 ```
 
-Or inside Pi: `/kb-status`, `/kb-index --dry-run`, `/kb-index`.
+Inside Pi: `/kb-status`, `/kb-index --dry-run`, `/kb-index` (rebuild only).
+
+Use **rebuild** after you change an existing note. `add` cannot replace old chunks. Mnemosyne splits a note into heading-sized documents; only the first chunk carries `[Source: …]`, so an in-place update would leave stale pieces behind. Rebuild is the correct fix and is cheap for a few hundred files.
+
+Do not run `add` on a file that is already indexed unless you plan to `index` afterward. You will get duplicates.
+
+`index` / `/kb-index` delete **only** the configured notes collection. They do not touch `global` or other project collections.
 
 Each Markdown file is cleaned, then handed to `mnemosyne add --file`, which chunks by heading (~2000 characters). Cleaning:
 
@@ -154,7 +178,7 @@ Share this git repo. Each person:
 2. Installs this package
 3. Creates their own `~/.pi/agent/mnemosyne-kb.json`
 4. Updates `~/.pi/agent/SYSTEM.md` with the retrieval cascade above
-5. Runs `index` against their own Markdown tree
+5. Runs `index` against their own Markdown tree (first time and after edits). Use `add --new` only for brand-new notes.
 
 Do not share `~/.local/share/mnemosyne/mnemosyne.db`. Do not put customer evidence in the notes path.
 

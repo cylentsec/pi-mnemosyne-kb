@@ -9,7 +9,13 @@ import {
 	loadConfig,
 	resolveCollection,
 } from "../lib/config.mjs";
-import { formatPlan, indexCollection, searchCollection } from "../lib/index-notes.mjs";
+import {
+	addFiles,
+	addNewFiles,
+	formatPlan,
+	indexCollection,
+	searchCollection,
+} from "../lib/index-notes.mjs";
 
 const USAGE = `pi-mnemosyne-kb — index a Markdown directory into a named Mnemosyne collection
 
@@ -17,6 +23,13 @@ Usage:
   pi-mnemosyne-kb status
   pi-mnemosyne-kb init-config
   pi-mnemosyne-kb index [--collection NAME] [--dry-run]
+      Full rebuild. Deletes the collection and re-reads every note.
+      Use this after editing or deleting existing notes.
+  pi-mnemosyne-kb add [--collection NAME] [--dry-run] <file.md> [file.md...]
+      Append specific new notes. Does not delete old chunks.
+      Files must sit under the configured notes path.
+  pi-mnemosyne-kb add --new [--collection NAME] [--dry-run]
+      Append notes on disk that are not in the collection yet.
   pi-mnemosyne-kb search <query> [--collection NAME] [--limit N]
 
 Config (first existing file wins):
@@ -45,6 +58,8 @@ function parseArgs(argv) {
 		} else if (token === "--collection" || token === "-n") {
 			args.collection = argv[i + 1];
 			i += 1;
+		} else if (token === "--new") {
+			args.new = true;
 		} else if (token === "--limit") {
 			args.limit = Number(argv[i + 1]);
 			i += 1;
@@ -107,6 +122,34 @@ function cmdIndex(args) {
 	if (result.errors?.length) process.exit(2);
 }
 
+function cmdAdd(args) {
+	const config = loadConfig();
+	const collection = resolveCollection(config, args.collection);
+	const files = args._.slice(1);
+	const progress = ({
+		added, total, file, ok,
+	}) => {
+		process.stderr.write(`[${added}/${total}] ${ok ? "ok" : "ERR"} ${file}\n`);
+	};
+
+	let result;
+	if (args.new) {
+		if (files.length) fail("add --new does not take file arguments");
+		result = addNewFiles(collection, config, {
+			dryRun: Boolean(args.dryRun),
+			onProgress: progress,
+		});
+	} else {
+		if (!files.length) fail("add requires file.md arguments, or use add --new");
+		result = addFiles(collection, config, files, {
+			dryRun: Boolean(args.dryRun),
+			onProgress: progress,
+		});
+	}
+	print(formatPlan(result));
+	if (result.errors?.length) process.exit(2);
+}
+
 function cmdSearch(args) {
 	const query = args._.slice(1).join(" ").trim();
 	if (!query) fail("search requires a query");
@@ -129,6 +172,7 @@ try {
 	if (command === "status") cmdStatus();
 	else if (command === "init-config") cmdInitConfig();
 	else if (command === "index") cmdIndex(args);
+	else if (command === "add") cmdAdd(args);
 	else if (command === "search") cmdSearch(args);
 	else fail(`Unknown command: ${command}\n\n${USAGE}`);
 } catch (error) {
