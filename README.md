@@ -85,6 +85,30 @@ Optional env overrides: `PI_MNEMOSYNE_KB_COLLECTION`, `PI_MNEMOSYNE_KB_PATH`, `P
 
 `name` becomes the Mnemosyne collection (`mnemosyne search -n AppSec`). It cannot be `global`.
 
+## Point the agent at the collection
+
+The plugin registers `kb_recall`, but Pi will not use it reliably until your **system prompt** says so. Do **not** put this in Mnemosyne `core` memory. `core` is for tiny durable facts and, if it is only in the project collection, it will not follow you into a customer directory.
+
+Put the routing in `~/.pi/agent/SYSTEM.md` (global) or `~/.pi/agent/APPEND_SYSTEM.md` (append-only). If a project has its own `.pi/SYSTEM.md`, that file **replaces** the global SYSTEM.md — use `APPEND_SYSTEM.md` or a one-line **global** `core` memory as backup.
+
+Add a cascade like this, using your collection name:
+
+```markdown
+## Memory Sources & Routing
+
+**Retrieval Cascade:**
+1. Methodology, techniques, payloads, checklists → `kb_recall` (Mnemosyne collection `AppSec`).
+2. This engagement's decisions and project facts → `memory_recall`.
+3. Cross-project preferences → `memory_recall_global`.
+4. If those miss → your notes vault, then the local file system.
+
+Do not invent procedures when `kb_recall` can be used first.
+Do not use `memory_recall` or bash `mnemosyne search` for those notes.
+Never write customer data, tokens, or engagement evidence into the knowledge base.
+```
+
+Replace `AppSec` with the `name` from your config. Start a new Pi session after editing.
+
 ## Index
 
 Preview, then rebuild. Rebuild deletes and recreates that collection only.
@@ -129,7 +153,8 @@ Share this git repo. Each person:
 1. Installs `mnemosyne` and `pi-mnemosyne`
 2. Installs this package
 3. Creates their own `~/.pi/agent/mnemosyne-kb.json`
-4. Runs `index` against their own Markdown tree
+4. Updates `~/.pi/agent/SYSTEM.md` with the retrieval cascade above
+5. Runs `index` against their own Markdown tree
 
 Do not share `~/.local/share/mnemosyne/mnemosyne.db`. Do not put customer evidence in the notes path.
 
